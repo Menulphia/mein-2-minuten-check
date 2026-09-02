@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2-Minuten-Check – Passt ein zweites Standbein zu deinem Leben?</title>
+<style>
+:root{
+  --bg:#fbf7f5;
+  --card:#ffffff;
+  --text:#2f2a2a;
+  --muted:#756b6b;
+  --accent:#d9879a;
+  --accent-dark:#b86178;
+  --line:#eadfe1;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  background:linear-gradient(180deg,#fff 0%,var(--bg) 100%);
+  color:var(--text);
+}
+.wrap{
+  max-width:760px;
+  margin:0 auto;
+  padding:32px 18px 56px;
+}
+.hero{
+  text-align:center;
+  padding:28px 16px 18px;
+}
+.kicker{
+  display:inline-block;
+  font-size:14px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--accent-dark);
+  font-weight:700;
+  margin-bottom:12px;
+}
+h1{
+  font-size:clamp(32px,7vw,56px);
+  line-height:1.05;
+  margin:0 0 16px;
+}
+.lead{
+  font-size:19px;
+  line-height:1.55;
+  color:var(--muted);
+  max-width:640px;
+  margin:0 auto;
+}
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:24px;
+  margin-top:22px;
+  box-shadow:0 10px 30px rgba(60,35,40,.06);
+}
+.progress{
+  height:8px;
+  background:#f0e6e8;
+  border-radius:999px;
+  overflow:hidden;
+  margin-bottom:18px;
+}
+.progress > div{
+  height:100%;
+  width:0%;
+  background:var(--accent);
+  transition:width .25s ease;
+}
+.question{
+  font-size:25px;
+  line-height:1.25;
+  margin:8px 0 18px;
+}
+.options{
+  display:grid;
+  gap:12px;
+}
+button.option{
+  width:100%;
+  text-align:left;
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:14px;
+  padding:16px 18px;
+  font-size:17px;
+  cursor:pointer;
+}
+button.option:hover{border-color:var(--accent); background:#fff8fa}
+.meta{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  color:var(--muted);
+  font-size:14px;
+}
+.result-score{
+  font-size:64px;
+  font-weight:800;
+  color:var(--accent-dark);
+  line-height:1;
+  margin:4px 0 8px;
+}
+.result-title{
+  font-size:30px;
+  margin:0 0 12px;
+}
+.result-text{
+  font-size:18px;
+  line-height:1.6;
+  color:var(--muted);
+}
+.points{
+  margin:18px 0 0;
+  padding-left:20px;
+}
+.points li{
+  margin:8px 0;
+  line-height:1.45;
+}
+.cta{
+  display:inline-block;
+  margin-top:22px;
+  text-decoration:none;
+  background:var(--accent);
+  color:#fff;
+  padding:15px 22px;
+  border-radius:12px;
+  font-weight:700;
+}
+.small{
+  font-size:13px;
+  color:#8a7e7e;
+  line-height:1.45;
+  margin-top:18px;
+}
+.restart{
+  margin-top:14px;
+  background:transparent;
+  color:var(--accent-dark);
+  border:0;
+  font-weight:700;
+  cursor:pointer;
+}
+.hidden{display:none}
+.footer{
+  text-align:center;
+  color:#978b8d;
+  font-size:13px;
+  margin-top:28px;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <div class="kicker">2-Minuten-Check</div>
+    <h1>Passt ein zweites Standbein zu deinem Leben?</h1>
+    <p class="lead">Beantworte 8 kurze Fragen und finde heraus, ob du dir mehr Spielraum, Flexibilität oder neue Möglichkeiten neben deinem bisherigen Beruf wünschst.</p>
+  </section>
+
+  <section class="card" id="quizCard">
+    <div class="progress"><div id="bar"></div></div>
+    <div class="meta"><span id="counter">Frage 1 von 8</span><span>ca. 2 Minuten</span></div>
+    <h2 class="question" id="question"></h2>
+    <div class="options" id="options"></div>
+  </section>
+
+  <section class="card hidden" id="resultCard">
+    <div class="kicker">Dein Ergebnis</div>
+    <div class="result-score" id="score">0</div>
+    <h2 class="result-title" id="resultTitle"></h2>
+    <p class="result-text" id="resultText"></p>
+    <ul class="points" id="resultPoints"></ul>
+    <a class="cta" id="cta" href="#" target="_blank" rel="noopener">Meine Möglichkeiten kennenlernen</a>
+    <div class="small">Hinweis: Dieser Check ist eine persönliche Orientierung und keine Einkommens-, Karriere- oder Erfolgsprognose.</div>
+    <button class="restart" onclick="restart()">Check noch einmal starten</button>
+  </section>
+
+  <div class="footer">© Ute Kramer · Persönlicher Orientierungs-Check</div>
+</div>
+
+<script>
+const questions = [
+  {
+    q:"Wie zufrieden bist du aktuell mit deiner Arbeitszeit?",
+    a:[
+      ["Sehr zufrieden",0],
+      ["Meistens zufrieden",1],
+      ["Ich wünsche mir etwas mehr Luft",2],
+      ["Ich möchte deutlich weniger gebunden sein",3]
+    ]
+  },
+  {
+    q:"Wie sehr hängt dein Einkommen davon ab, dass du selbst arbeitest?",
+    a:[
+      ["Nur wenig",0],
+      ["Teilweise",1],
+      ["Ziemlich stark",2],
+      ["Fast vollständig",3]
+    ]
+  },
+  {
+    q:"Wie körperlich oder mental anstrengend empfindest du deinen Beruf?",
+    a:[
+      ["Kaum anstrengend",0],
+      ["Es geht meistens gut",1],
+      ["Es kostet mich spürbar Kraft",2],
+      ["Ich frage mich, wie lange ich das so machen möchte",3]
+    ]
+  },
+  {
+    q:"Wie wichtig wäre dir ein zusätzlicher finanzieller Spielraum?",
+    a:[
+      ["Im Moment gar nicht wichtig",0],
+      ["Ganz nett, aber kein Thema",1],
+      ["Schon wichtig",2],
+      ["Sehr wichtig",3]
+    ]
+  },
+  {
+    q:"Wie wichtig ist dir mehr zeitliche Flexibilität?",
+    a:[
+      ["Nicht besonders",0],
+      ["Ein bisschen",1],
+      ["Ziemlich wichtig",2],
+      ["Sehr wichtig",3]
+    ]
+  },
+  {
+    q:"Wie offen bist du für etwas Neues neben deinem bisherigen Beruf?",
+    a:[
+      ["Im Moment gar nicht",0],
+      ["Ich würde es mir anhören",1],
+      ["Ich bin neugierig",2],
+      ["Ich suche bereits aktiv nach Möglichkeiten",3]
+    ]
+  },
+  {
+    q:"Arbeitest du gerne mit Menschen und empfiehlst Dinge, von denen du überzeugt bist?",
+    a:[
+      ["Eher nicht",0],
+      ["Manchmal",1],
+      ["Ja, durchaus",2],
+      ["Ja, das liegt mir sehr",3]
+    ]
+  },
+  {
+    q:"Was beschreibt dich im Moment am besten?",
+    a:[
+      ["Ich möchte alles so lassen, wie es ist",0],
+      ["Ich denke gelegentlich über Veränderungen nach",1],
+      ["Ich wünsche mir mehr Möglichkeiten",2],
+      ["Ich möchte jetzt wirklich etwas verändern",3]
+    ]
+  }
+];
+
+let index = 0;
+let total = 0;
+
+function render(){
+  const q = questions[index];
+  document.getElementById("question").textContent = q.q;
+  document.getElementById("counter").textContent = `Frage ${index+1} von ${questions.length}`;
+  document.getElementById("bar").style.width = `${(index/questions.length)*100}%`;
+  const box = document.getElementById("options");
+  box.innerHTML = "";
+  q.a.forEach(([label,pts])=>{
+    const b = document.createElement("button");
+    b.className = "option";
+    b.textContent = label;
+    b.onclick = ()=>answer(pts);
+    box.appendChild(b);
+  });
+}
+
+function answer(pts){
+  total += pts;
+  index++;
+  if(index < questions.length) render();
+  else showResult();
+}
+
+function showResult(){
+  const max = questions.length * 3;
+  const pct = Math.round(total/max*100);
+  document.getElementById("quizCard").classList.add("hidden");
+  document.getElementById("resultCard").classList.remove("hidden");
+  document.getElementById("score").textContent = pct + "/100";
+
+  let title, text, points;
+  if(pct <= 30){
+    title = "Du bist im Moment ziemlich zufrieden.";
+    text = "Bei dir gibt es aktuell wenig Veränderungsdruck. Das ist völlig in Ordnung. Interessant kann es trotzdem sein, neue Möglichkeiten einfach zu kennen – ohne daraus sofort etwas machen zu müssen.";
+    points = [
+      "Du empfindest aktuell wenig Handlungsdruck.",
+      "Deine bestehende Situation scheint gut zu deinem Leben zu passen.",
+      "Neue Möglichkeiten dürfen für dich eher Inspiration als Aufgabe sein."
+    ];
+  } else if(pct <= 58){
+    title = "Du wünschst dir an einigen Stellen mehr Spielraum.";
+    text = "Du möchtest nicht unbedingt alles verändern – aber mehr Flexibilität, Entlastung oder zusätzliche Möglichkeiten könnten gut zu dir passen. Genau hier lohnt es sich, ohne Druck genauer hinzuschauen.";
+    points = [
+      "Du siehst erste Punkte, die du gerne verbessern würdest.",
+      "Flexibilität und neue Optionen könnten für dich interessant sein.",
+      "Ein zweites Standbein müsste vor allem gut in deinen Alltag passen."
+    ];
+  } else if(pct <= 80){
+    title = "Bei dir ist der Wunsch nach Veränderung deutlich.";
+    text = "Mehr Spielraum in Zeit, Arbeit oder Einkommen ist für dich kein abstrakter Gedanke mehr. Eine zusätzliche Möglichkeit neben deinem bisherigen Beruf könnte deshalb spannend sein – vorausgesetzt, sie passt wirklich zu dir.";
+    points = [
+      "Du möchtest dich langfristig weniger abhängig von deiner bisherigen Arbeitsweise fühlen.",
+      "Du bist offen für neue Wege, ohne gleich alles auf den Kopf zu stellen.",
+      "Ein Schritt-für-Schritt-Modell könnte gut zu dir passen."
+    ];
+  } else {
+    title = "Du bist bereit, neue Möglichkeiten ernsthaft anzuschauen.";
+    text = "Deine Antworten zeigen einen klaren Wunsch nach Veränderung und mehr Gestaltungsspielraum. Du musst deshalb nichts überstürzen – aber es könnte genau der richtige Zeitpunkt sein, dir eine zusätzliche Möglichkeit einmal unverbindlich anzusehen.";
+    points = [
+      "Du möchtest aktiv etwas verändern.",
+      "Mehr Flexibilität und zusätzlicher Spielraum sind dir wichtig.",
+      "Du bist offen, etwas Neues Schritt für Schritt auszuprobieren."
+    ];
+  }
+  document.getElementById("resultTitle").textContent = title;
+  document.getElementById("resultText").textContent = text;
+  const ul = document.getElementById("resultPoints");
+  ul.innerHTML = "";
+  points.forEach(p=>{
+    const li = document.createElement("li");
+    li.textContent = p;
+    ul.appendChild(li);
+  });
+  document.getElementById("bar").style.width = "100%";
+}
+
+function restart(){
+  index = 0; total = 0;
+  document.getElementById("resultCard").classList.add("hidden");
+  document.getElementById("quizCard").classList.remove("hidden");
+  render();
+}
+
+render();
+
+/* HIER SPÄTER DEINEN ECHTEN LINK EINSETZEN */
+document.getElementById("cta").href = "https://bit.ly/3I3aIkA";
+</script>
+</body>
+</html>
